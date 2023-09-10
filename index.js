@@ -27,10 +27,20 @@ async function run() {
     await client.connect();
 
     const serviceCollection = client.db("jerinsParlour").collection("services");
+    const bookingCollection = client.db("jerinsParlour").collection("bookings");
 
+    // services api
     app.get("/services", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const result = await serviceCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
+    // bookings api
+    app.post("/bookings", async (req, res) => {
+      const bookingInfo = req.body;
+      console.log(bookingInfo);
+      const result = await bookingCollection.insertOne(bookingInfo);
       res.send(result);
     });
 
