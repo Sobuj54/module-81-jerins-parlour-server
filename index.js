@@ -25,6 +25,15 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const serviceCollection = client.db("jerinsParlour").collection("services");
+
+    app.get("/services", async (req, res) => {
+      const limit = parseInt(req.query.limit);
+      const result = await serviceCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
