@@ -28,6 +28,7 @@ async function run() {
 
     const serviceCollection = client.db("jerinsParlour").collection("services");
     const bookingCollection = client.db("jerinsParlour").collection("bookings");
+    const reviewCollection = client.db("jerinsParlour").collection("reviews");
 
     // services api
     app.get("/services", async (req, res) => {
@@ -47,6 +48,12 @@ async function run() {
       const email = req.query.email;
       const query = { email: email };
       const result = await bookingCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // reviews api
+    app.get("/reviews", async (req, res) => {
+      const result = await reviewCollection.find().toArray();
       res.send(result);
     });
 
