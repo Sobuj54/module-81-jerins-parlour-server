@@ -64,6 +64,12 @@ async function run() {
       res.send(result);
     });
 
+    app.post("/services", verifyJWT, async (req, res) => {
+      const newService = req.body;
+      const result = await serviceCollection.insertOne(newService);
+      res.send(result);
+    });
+
     // bookings api
     app.post("/bookings", verifyJWT, async (req, res) => {
       const bookingInfo = req.body;
