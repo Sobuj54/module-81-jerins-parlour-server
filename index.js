@@ -71,11 +71,31 @@ async function run() {
       res.send(result);
     });
 
+    // get bookings
     app.get("/bookings", verifyJWT, async (req, res) => {
       const email = req.query.email;
-      const query = { email: email };
-      const result = await bookingCollection.find(query).toArray();
-      res.send(result);
+
+      if (email) {
+        const query = { email: email };
+        const result = await bookingCollection.find(query).toArray();
+        return res.send(result);
+      }
+
+      const options = {
+        sort: {
+          userName: 1,
+        },
+        projection: {
+          _id: 1,
+          userName: 1,
+          email: 1,
+          title: 1,
+          isPaid: 1,
+        },
+      };
+      // be careful when using only options in find..find function takes two parameters one is query and other is options so when using only options ..we should provide empty object to first argument.
+      const allBookings = await bookingCollection.find({}, options).toArray();
+      res.send(allBookings);
     });
 
     // reviews api
