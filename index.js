@@ -72,6 +72,11 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users", verifyJWT, async (req, res) => {
+      const result = await userCollection.find().toArray();
+      res.send(result);
+    });
+
     // services api
     app.get("/services", async (req, res) => {
       const limit = parseInt(req.query.limit);
