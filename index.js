@@ -23,7 +23,9 @@ const verifyJWT = (req, res, next) => {
   const token = authorization.split(" ")[1];
   jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
     if (err) {
-      res.status(403).send({ error: true, message: "unauthorized access" });
+      return res
+        .status(403)
+        .send({ error: true, message: "unauthorized access" });
     }
     req.decoded = decoded;
     next();
@@ -49,12 +51,25 @@ async function run() {
     const serviceCollection = client.db("jerinsParlour").collection("services");
     const bookingCollection = client.db("jerinsParlour").collection("bookings");
     const reviewCollection = client.db("jerinsParlour").collection("reviews");
+    const userCollection = client.db("jerinsParlour").collection("users");
 
     // jwt token
     app.post("/jwt", (req, res) => {
       const user = req.body;
       const token = jwt.sign(user, process.env.JWT_TOKEN, { expiresIn: "1h" });
       res.send({ token });
+    });
+
+    // users api
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user?.email };
+      const existingUser = await userCollection.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "user already exists." });
+      }
+      const result = await userCollection.insertOne(user);
+      res.send(result);
     });
 
     // services api
