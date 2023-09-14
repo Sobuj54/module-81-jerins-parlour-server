@@ -23,9 +23,7 @@ const verifyJWT = (req, res, next) => {
   const token = authorization.split(" ")[1];
   jwt.verify(token, process.env.JWT_TOKEN, (err, decoded) => {
     if (err) {
-      return res
-        .status(403)
-        .send({ error: true, message: "unauthorized access" });
+      res.status(403).send({ error: true, message: "unauthorized access" });
     }
     req.decoded = decoded;
     next();
@@ -69,6 +67,15 @@ async function run() {
         return res.send({ message: "user already exists." });
       }
       const result = await userCollection.insertOne(user);
+      res.send(result);
+    });
+
+    // get admin
+    app.get("/users/admin/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      const result = { role: user?.role };
       res.send(result);
     });
 
