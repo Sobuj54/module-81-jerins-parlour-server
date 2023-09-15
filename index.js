@@ -112,6 +112,15 @@ async function run() {
       res.send(result);
     });
 
+    app.put("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const updateDoc = req.body;
+
+      const filter = { _id: new ObjectId(id) };
+      const result = await serviceCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
     // bookings api
     app.post("/bookings", verifyJWT, async (req, res) => {
       const bookingInfo = req.body;
