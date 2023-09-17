@@ -134,6 +134,13 @@ async function run() {
       res.send(result);
     });
 
+    app.delete("/services/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await serviceCollection.deleteOne(query);
+      res.send(result);
+    });
+
     // bookings api
     app.post("/bookings", verifyJWT, async (req, res) => {
       const bookingInfo = req.body;
