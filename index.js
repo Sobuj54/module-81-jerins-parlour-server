@@ -106,18 +106,31 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/services/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await serviceCollection.findOne(query);
+      res.send(result);
+    });
+
     app.post("/services", verifyJWT, async (req, res) => {
       const newService = req.body;
       const result = await serviceCollection.insertOne(newService);
       res.send(result);
     });
 
-    app.put("/services/:id", async (req, res) => {
+    app.patch("/services/:id", async (req, res) => {
       const id = req.params.id;
-      const updateDoc = req.body;
-
+      const data = req.body;
+      const updatedDoc = {
+        $set: {
+          title: data.title,
+          price: parseFloat(data.price),
+          description: data.description,
+        },
+      };
       const filter = { _id: new ObjectId(id) };
-      const result = await serviceCollection.updateOne(filter, updateDoc);
+      const result = await serviceCollection.updateOne(filter, updatedDoc);
       res.send(result);
     });
 
