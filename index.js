@@ -58,6 +58,17 @@ async function run() {
       res.send({ token });
     });
 
+    // verify Admin
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== "Admin") {
+        return res.status(403).send({ error: true, message: "forbidden" });
+      }
+      next();
+    };
+
     // users api
     app.post("/users", async (req, res) => {
       const user = req.body;
@@ -80,7 +91,7 @@ async function run() {
     });
 
     // updating user role
-    app.patch("/users/admin/:id", verifyJWT, async (req, res) => {
+    app.patch("/users/admin/:id", verifyJWT, verifyAdmin, async (req, res) => {
       const id = req.params.id;
       const role = req.query.role;
       const filter = { _id: new ObjectId(id) };
@@ -98,6 +109,18 @@ async function run() {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
+
+    app.delete(
+      "/users/admin/:name",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const name = req.params.name;
+        const query = { name: name };
+        const result = await userCollection.deleteOne(query);
+        res.send(result);
+      }
+    );
 
     // services api
     app.get("/services", async (req, res) => {
@@ -142,7 +165,7 @@ async function run() {
     });
 
     // bookings api
-    app.post("/bookings", verifyJWT, async (req, res) => {
+    app.post("/bookings", async (req, res) => {
       const bookingInfo = req.body;
       const result = await bookingCollection.insertOne(bookingInfo);
       res.send(result);
